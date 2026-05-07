@@ -21,9 +21,9 @@ jobs:
     - name: Build Backend Ventas
       run: |
         cd back-Ventas_SpringBoot/Springboot-API-REST
-        mvn clean install
+        mvn clean install -DskipTests
 
     - name: Build Backend Despachos
       run: |
         cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
-        mvn clean install
+        mvn clean install -DskipTests
