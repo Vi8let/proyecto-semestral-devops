@@ -1,0 +1,29 @@
+name: CI/CD Proyecto DevOps
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clonar repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build Backend Ventas
+      run: |
+        cd back-Ventas_SpringBoot/Springboot-API-REST
+        mvn clean install
+
+    - name: Build Backend Despachos
+      run: |
+        cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+        mvn clean install
