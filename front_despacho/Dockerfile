@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copiar archivos de dependencias primero (mejor caché)
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Copiar el resto del código
 COPY . .
