@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   front-despacho:
-    image: TU_USUARIO_DOCKERHUB/front-despacho:latest
+    image: vi8letpaz/front-despacho:latest
     container_name: front-despacho
     restart: always
     ports:
