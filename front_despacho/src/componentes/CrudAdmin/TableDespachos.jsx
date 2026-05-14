@@ -7,8 +7,9 @@ export const TableDespachos = () => {
   const [despachos, setDespachos] = useState([]);
 
   const despacho = async () => {
+    // AQUÍ ESTÁ EL CAMBIO: Ruta relativa
     await axios
-      .get("http://192.168.3.20/api/v1/despachos", {
+      .get("/api/v1/despachos", {
         headers:{
               'Content-Type': 'application/json',
               'Accept': 'application/json'
@@ -51,7 +52,7 @@ export const TableDespachos = () => {
               </thead>
               <tbody>
                 {despachos
-               
+                
                 .map((despacho) => (
                   <tr key={despacho.idDespacho}>
                     <td className="pr-10 py-10 items-center">{despacho.idDespacho}</td>
