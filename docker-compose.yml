@@ -1,7 +1,12 @@
+version: '3.8'
+
 services:
   front-despacho:
-    image: tuusuario/front-despacho:latest
+    image: TU_USUARIO_DOCKERHUB/front-despacho:latest
     container_name: front-despacho
     restart: always
     ports:
       - "80:80"
+    environment:
+      VITE_API_VENTAS_URL: http://10.0.142.109:8080
+      VITE_API_DESPACHOS_URL: http://10.0.142.109:8081
