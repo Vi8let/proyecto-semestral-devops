@@ -3,46 +3,48 @@ name: CI/CD Proyecto DevOps
 on:
   push:
     branches:
-      - main
+      - deploy        # Solo se activa cuando haces push a la rama deploy
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repositorio
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configurar Java 17
-        uses: actions/setup-java@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Backend Ventas
-        run: |
-          cd back-Ventas_SpringBoot/Springboot-API-REST
-          chmod +x mvnw
-          ./mvnw clean install -DskipTests
-
-      - name: Build Backend Despachos
-        run: |
-          cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
-          chmod +x mvnw
-          ./mvnw clean install -DskipTests
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      # ================== BUILD & PUSH FRONTEND ==================
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v6
         with:
-          node-version: '20'
+          context: ./front_despacho
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/front-despacho:latest
 
-      - name: Build Frontend React
-        run: |
-          cd front_despacho
-          npm install
-          npm run build
+      # ================== BUILD & PUSH BACKEND VENTAS ==================
+      - name: Build & Push Backend Ventas
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-Ventas_SpringBoot/Springboot-API-REST
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/back-ventas:latest
 
-      - name: Deploy Frontend EC2
+      # ================== BUILD & PUSH BACKEND DESPACHOS ==================
+      - name: Build & Push Backend Despachos
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/back-despachos:latest
+
+      # ================== DEPLOY EN EC2 FRONTEND ==================
+      - name: Deploy to EC2 Frontend
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.FRONTEND_HOST }}
@@ -50,6 +52,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/proyecto-semestral-devops
-            git pull origin main
-            docker compose down
-            docker compose up -d --build
+            git pull origin deploy
+            docker compose -f docker-compose-frontend.yml down
+            docker compose -f docker-compose-frontend.yml pull
+            docker compose -f docker-compose-frontend.yml up -d
+            echo "✅ Frontend desplegado correctamente"
