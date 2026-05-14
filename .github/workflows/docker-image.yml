@@ -10,47 +10,46 @@ build-and-deploy:
 runs-on: ubuntu-latest
 
 steps:
+  - name: Clonar repositorio
+    uses: actions/checkout@v4
 
-- name: Clonar repositorio
-  uses: actions/checkout@v4
+  - name: Configurar Java 17
+    uses: actions/setup-java@v4
+    with:
+      distribution: 'temurin'
+      java-version: '17'
 
-- name: Configurar Java 17
-  uses: actions/setup-java@v4
-  with:
-    distribution: 'temurin'
-    java-version: '17'
+  - name: Build Backend Ventas
+    run: |
+      cd back-Ventas_SpringBoot/Springboot-API-REST
+      chmod +x mvnw
+      ./mvnw clean install -DskipTests
 
-- name: Build Backend Ventas
-  run: |
-    cd back-Ventas_SpringBoot/Springboot-API-REST
-    chmod +x mvnw
-    ./mvnw clean install -DskipTests
+  - name: Build Backend Despachos
+    run: |
+      cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+      chmod +x mvnw
+      ./mvnw clean install -DskipTests
 
-- name: Build Backend Despachos
-  run: |
-    cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
-    chmod +x mvnw
-    ./mvnw clean install -DskipTests
+  - name: Configurar Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: '20'
 
-- name: Configurar Node.js
-  uses: actions/setup-node@v4
-  with:
-    node-version: '20'
+  - name: Build Frontend React
+    run: |
+      cd front_despacho
+      npm install
+      npm run build
 
-- name: Build Frontend React
-  run: |
-    cd front_despacho
-    npm install
-    npm run build
-
-- name: Deploy Frontend EC2
-  uses: appleboy/ssh-action@master
-  with:
-    host: ${{ secrets.FRONTEND_HOST }}
-    username: ${{ secrets.EC2_USERNAME }}
-    key: ${{ secrets.EC2_SSH_KEY }}
-    script: |
-      cd ~/proyecto-semestral-devops
-      git pull origin main
-      docker compose down
-      docker compose up -d --build
+  - name: Deploy Frontend EC2
+    uses: appleboy/ssh-action@master
+    with:
+      host: ${{ secrets.FRONTEND_HOST }}
+      username: ${{ secrets.EC2_USERNAME }}
+      key: ${{ secrets.EC2_SSH_KEY }}
+      script: |
+        cd ~/proyecto-semestral-devops
+        git pull origin main
+        docker compose down
+        docker compose up -d --build
