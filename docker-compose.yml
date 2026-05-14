@@ -1,36 +1,7 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
+  front-despacho:
+    image: tuusuario/front-despacho:latest
+    container_name: front-despacho
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: ventasdb
-    volumes:
-      - mysql_data:/var/lib/mysql
-    # No exponer puerto 3306 al exterior
-
-  ventas-api:
-    image: tuusuario/back-ventas:latest     # ← Después de push
-    container_name: ventas-api
-    restart: always
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ventasdb?useSSL=false&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 1234
-    depends_on:
-      - mysql
-
-  despacho-api:
-    image: tuusuario/back-despachos:latest
-    container_name: despacho-api
-    restart: always
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/despachosdb?useSSL=false&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 1234
-    depends_on:
-      - mysql
-
-volumes:
-  mysql_data:
+    ports:
+      - "80:80"
